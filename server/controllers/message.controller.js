@@ -1,28 +1,139 @@
+// import { catchAsyncError } from "../middlewares/catchAsyncError.middleware.js";
+// import { User } from "../model/user.model.js";
+// import { Message } from "../model/message.model.js";
+// import { v2 as cloudinary } from "cloudinary";
+// import { getReceiverSocketId, io } from "../utils/socket.js";
+
+// export const getAllUsers = catchAsyncError(async (req, res, next) => {
+//   const user = req.user;
+//   const filterdUsers = await User.find({ _id: { $ne: user } }).select(
+//     "-password"
+//   );
+//   res.status(200).json({
+//     success: true,
+//     users: filterdUsers
+//   });
+// });
+
+// export const getMessages = catchAsyncError(async (req, res, next) => {
+//   const receiverId = req.params.id;
+//   const myID = req.user._id;
+
+//   const receiver = await User.findById(receiverId);
+
+//   if (!receiver) {
+//     res.status(400).json({
+//       success: false,
+//       message: "Receiver ID Invalid"
+//     });
+//   }
+
+//   const messages = await Message.find({
+//     $or: [
+//       { senderId: myID, receiverId: receiverId },
+//       { senderId: receiverId, receiverId: myID }
+//     ]
+//   }).sort({ createdAt: 1 });
+
+//   res.status(200).json({
+//     success: true,
+//     messages
+//   });
+// });
+
+// export const sendMessage = catchAsyncError(async (req, res, next) => {
+//   const { text } = req.body;
+//   const media = req?.files?.media;
+
+//   const { id: receiverId } = req.params;
+
+//   const senderId = req.user._id;
+
+//   const receiver = await User.findById(receiverId);
+//   if (!receiver) {
+//     res.status(400).json({
+//       success: false,
+//       message: "Receiver ID Invalid"
+//     });
+//   }
+
+//   const sanitizedText = text?.trim() || "";
+
+//   if (!sanitizedText && !media) {
+//     res.status(400).json({
+//       success: false,
+//       message: "Cannot Send empty message"
+//     });
+//   }
+
+//   let mediaUrl = "";
+
+//   if (media) {
+//     try {
+//       const uploadResponse = await cloudinary.uploader.upload(
+//         media.tempFilePath,
+//         {
+//           resource_type: "auto",
+//           folder: "CHAT_APP_MEDIA",
+//           transformation: [
+//             { width: 1080, height: 1080, crop: "limit" },
+//             { quality: "auto" },
+//             { fetch_format: "auto" }
+//           ]
+//         }
+//       );
+
+//       mediaUrl = uploadResponse?.secure_url;
+//     } catch (error) {
+//       console.log("Cloudinary Upload Error", error);
+
+//       return res.status(403).json({
+//         success: false,
+//         message: "Failed to upload media, please try again later"
+//       });
+//     }
+//   }
+
+//   const newMessage = await Message.create({
+//     senderId,
+//     receiverId,
+//     text: sanitizedText,
+//     media: mediaUrl
+//   });
+
+//   const receiverSocketId = getReceiverSocketId(receiverId);
+//   if (receiverSocketId) {
+//     io.to(receiverSocketId).emit("newMessage", newMessage);
+//   }
+
+//   res.status(201).json(newMessage);
+// });
+
 import { catchAsyncError } from "../middlewares/catchAsyncError.middleware.js";
 import { User } from "../model/user.model.js";
 import { Message } from "../model/message.model.js";
 import { v2 as cloudinary } from "cloudinary";
-import { getReeceiverSocketId, io } from "../utils/socket.js";
+import { getReceiverSocketId, io } from "../utils/socket.js";
 
 export const getAllUsers = catchAsyncError(async (req, res, next) => {
   const user = req.user;
-  const filterdUsers = await User.find({ _id: { $ne: user } }).select(
+  const filteredUsers = await User.find({ _id: { $ne: user._id } }).select(
     "-password"
   );
   res.status(200).json({
     success: true,
-    users: filterdUsers
+    users: filteredUsers
   });
 });
 
 export const getMessages = catchAsyncError(async (req, res, next) => {
-  const receiverID = req.params.id;
-  const myID = req.user._id;
+  const receiverId = req.params.id;
+  const myId = req.user._id;
 
-  const receiver = await User.findById(receiverID);
+  const receiver = await User.findById(receiverId);
 
   if (!receiver) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: "Receiver ID Invalid"
     });
@@ -30,8 +141,8 @@ export const getMessages = catchAsyncError(async (req, res, next) => {
 
   const messages = await Message.find({
     $or: [
-      { senderId: myID, receiverId: receiverID },
-      { senderId: receiverID, receiverId: myID }
+      { senderId: myId, receiverId },
+      { senderId: receiverId, receiverId: myId }
     ]
   }).sort({ createdAt: 1 });
 
@@ -44,14 +155,12 @@ export const getMessages = catchAsyncError(async (req, res, next) => {
 export const sendMessage = catchAsyncError(async (req, res, next) => {
   const { text } = req.body;
   const media = req?.files?.media;
-
   const { id: receiverId } = req.params;
-
   const senderId = req.user._id;
 
-  const receiver = await User.findById(receiverID);
+  const receiver = await User.findById(receiverId);
   if (!receiver) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: "Receiver ID Invalid"
     });
@@ -59,10 +168,10 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
 
   const sanitizedText = text?.trim() || "";
 
-  if (!sanitizedText && media) {
-    res.status(400).json({
+  if (!sanitizedText && !media) {
+    return res.status(400).json({
       success: false,
-      message: "Cannot Send empty message"
+      message: "Cannot send empty message"
     });
   }
 
@@ -82,11 +191,9 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
           ]
         }
       );
-
       mediaUrl = uploadResponse?.secure_url;
     } catch (error) {
       console.log("Cloudinary Upload Error", error);
-
       return res.status(403).json({
         success: false,
         message: "Failed to upload media, please try again later"
@@ -101,7 +208,7 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
     media: mediaUrl
   });
 
-  const receiverSocketId = getReeceiverSocketId(receiverId);
+  const receiverSocketId = getReceiverSocketId(receiverId);
   if (receiverSocketId) {
     io.to(receiverSocketId).emit("newMessage", newMessage);
   }
