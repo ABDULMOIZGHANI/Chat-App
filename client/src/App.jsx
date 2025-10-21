@@ -10,6 +10,9 @@ import Navbar from "./components/Navbar.jsx"
 import Register from "./pages/Register.jsx"
 import Login from "./pages/Login.jsx"
 import Profile from "./pages/Profile.jsx"
+import Home from "./pages/Home.jsx"
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const { authUser, isCheckingAuth } = useSelector(state => state.auth)
@@ -48,6 +51,7 @@ const App = () => {
         <Route path="/login" element={!authUser ? <Login /> : <Navigate to={"/"} />} />
         <Route path="/profile" element={authUser ? <Profile /> : <Navigate to={"/login"} />} />
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router></>;
 };
 
