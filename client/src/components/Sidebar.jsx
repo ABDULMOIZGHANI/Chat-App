@@ -12,7 +12,7 @@ const Sidebar = () => {
   const { onlineUsers } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  console.log("ONLINE USERS", onlineUsers);
+  // console.log("ONLINE USERS", onlineUsers);
 
   useEffect(() => {
     dispatch(getUsers());
