@@ -118,7 +118,7 @@ const Login = () => {
         subtitle="Sign in to continue your conversation and catch up with your messages."
       />
     </div>
-  );;
+  );
 };
 
 export default Login;
