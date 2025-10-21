@@ -7,6 +7,9 @@ import { getUser, serOnlineUsers } from "./store/slices/authSlice";
 import { connectSocket, disconnectSocket } from "./lib/socket";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import Navbar from "./components/Navbar.jsx"
+import Register from "./pages/Register.jsx"
+import Login from "./pages/Login.jsx"
+import Profile from "./pages/Profile.jsx"
 
 const App = () => {
   const { authUser, isCheckingAuth } = useSelector(state => state.auth)
@@ -29,7 +32,7 @@ const App = () => {
   }, [authUser])
 
   if (isCheckingAuth && !authUser) {
-    retuen(
+    return (
       <div className="flex items-center justify-center h-screen">
         <Loader className="size-10 animate-spins" />
       </div>
