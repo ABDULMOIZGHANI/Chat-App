@@ -20,7 +20,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(getUser())
-  }, [getUser])
+  }, [authUser])
 
   useEffect(() => {
     if (authUser) {

@@ -31,12 +31,28 @@ export const login = createAsyncThunk("user/signin", async (data, thunkAPI) => {
   try {
     const res = await axiosInstance.post("/user/signin", data); // ✅ FIXED
     connectSocket(res.data.user);
+    toast.success("Account loggedin successfully");
     return res.data.user; // ✅ Return user data
   } catch (error) {
     toast.error(error.response?.data?.message || "Login failed");
     return thunkAPI.rejectWithValue(error.response?.data?.message);
   }
 });
+
+export const signup = createAsyncThunk(
+  "user/signup",
+  async (data, thunkAPI) => {
+    try {
+      const res = await axiosInstance.post("/user/signup", data);
+      connectSocket(res.data.user);
+      toast.success("Account created successfully");
+      return res.data.user;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Account Created failed");
+      return thunkAPI.rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -79,6 +95,16 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state) => {
         state.isLoggingIn = false;
+      })
+      .addCase(signup.pending, (state) => {
+        state.isSigningUp = true;
+      })
+      .addCase(signup.fulfilled, (state, action) => {
+        state.authUser = action.payload;
+        state.isSigningUp = false;
+      })
+      .addCase(signup.rejected, (state) => {
+        state.isSigningUp = false;
       });
   }
 });

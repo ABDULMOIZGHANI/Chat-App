@@ -1,7 +1,6 @@
 import {
   Eye,
   EyeOff,
-  Link,
   Loader2,
   Lock,
   Mail,
@@ -11,6 +10,8 @@ import {
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux"
 import AuthImagePattern from "../components/AuthImagePattern";
+import { signup } from "../store/slices/authSlice";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -25,8 +26,8 @@ const Register = () => {
   const { isSigningUp } = useSelector(state => state.auth)
 
   const handleSubmit = (e) => {
-    e.preventDefalt()
-    // dispatch(signup(formData))
+    e.preventDefault()
+    dispatch(signup(formData))
   }
 
   return <>
@@ -131,8 +132,8 @@ const Register = () => {
           {/* FOOTER */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              You have an account?{" "}
-              <Link to="/signin" className="text-blue-600 hover:underline">
+              You have an account?
+              <Link to="/login" className="text-blue-600 hover:underline">
                 Sign In
               </Link>
             </p>
