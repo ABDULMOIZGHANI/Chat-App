@@ -16,7 +16,7 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    dispatch(getMessages(selectedUser_id));
+    dispatch(getMessages(selectedUser._id));
   }, [selectedUser._id]);
 
   useEffect(() => {
@@ -116,6 +116,8 @@ const ChatContainer = () => {
             }
           </div>
         }
+
+        <MessageInput />
       </div>
     </>
   );

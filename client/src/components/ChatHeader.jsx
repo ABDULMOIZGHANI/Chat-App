@@ -4,7 +4,7 @@ import { setSelectedUser } from "../store/slices/chatSlice";
 
 const ChatHeader = () => {
   const { selectedUser } = useSelector((state) => state.chat);
-  const { onLineUsers } = useSelector((state) => state.auth);
+  const { onlineUsers } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   return (
@@ -19,7 +19,7 @@ const ChatHeader = () => {
               alt="avatar"
               className="w-full h-full object-cover rounded-full"
             />
-            {onLineUsers.includes(selectedUser?._id) && (
+            {onlineUsers?.includes(selectedUser?._id) && (
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-white border-2 rounded-full" />
             )}
           </div>
@@ -30,7 +30,7 @@ const ChatHeader = () => {
               {selectedUser?.fullName}
             </h3>
             <p className="text-sm text-gray-600">
-              {onLineUsers.includes(selectedUser?._id) ? "Online" : "Offline"}
+              {onlineUsers?.includes(selectedUser?._id) ? "Online" : "Offline"}
             </p>
           </div>
         </div>
