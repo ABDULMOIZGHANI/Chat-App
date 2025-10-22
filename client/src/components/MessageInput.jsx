@@ -2,6 +2,7 @@ import { Image, Send, X, Video } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSocket } from "../lib/socket";
+import { sendMessages } from "../store/slices/chatSlice";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
@@ -56,7 +57,7 @@ const MessageInput = () => {
     data.append("text", text.trim());
     data.append("media", media);
 
-    // dispatch(sendMessage(data))
+    dispatch(sendMessages(data))
 
     // Reset All
     setText("");
