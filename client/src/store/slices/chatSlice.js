@@ -77,7 +77,7 @@ const chatSlice = createSlice({
         state.isMessagesLoading = true;
       })
       .addCase(getMessages.fulfilled, (state, action) => {
-        state.users = action.payload.messages;
+        state.messages = action.payload.messages;
         state.isMessagesLoading = false;
       })
       .addCase(getMessages.rejected, (state) => {
